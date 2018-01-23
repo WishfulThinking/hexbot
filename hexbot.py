@@ -177,7 +177,7 @@ def bet(sender, message):
 
 def compute_score(final_time, lateness, inaccuracy):
     score = ((final_time - (((lateness**2) / final_time) / 8) - inaccuracy) / final_time) * 100000
-    return max(round(score, 2), 0)
+    return max(round(score, 3), 0)
 
 def format_delta(delta):
     delta = str(delta)
@@ -202,8 +202,8 @@ def winners(sender, message):
         return
 
     results = []
+    betstart_time = data['betstart_time']
     for user in data['bets']:
-        betstart_time = data['betstart_time']
         user_bet_time = data['bets'][user][0]
         user_bet = data['bets'][user][1]
 
@@ -216,6 +216,18 @@ def winners(sender, message):
         results.append((score, user, user_bet, lateness_delta))
 
     results = sorted(results)
+    results.reverse()
+
+    results_file = open('results_{}'.format(str(betstart_time)), 'w')
+    results_file.write('{}, {}, {}\n'.format(str(final_time), str(betstart_time), str(betend_time)))
+    for result in results:
+        results_file.write('{}, {}, {}, {}\n'.format(
+            str(result[1]),
+            str(result[0]),
+            str(result[2]),
+            str(result[3])))
+    results_file.close()
+
     winning_bets = results[:5]
     formatted_winners = []
     for bet in winning_bets:
