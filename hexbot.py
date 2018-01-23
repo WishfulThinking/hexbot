@@ -31,9 +31,6 @@ data = {}
 def log_info(s):
     print('[i] {}'.format(s))
 
-def log_error(s):
-    print('[e] {}'.format(s))
-
 def log_debug(s):
     if debug:
         print('[d] {}'.format(s))
@@ -66,12 +63,12 @@ def auth_and_join():
     irc_send('NICK {}'.format(config['nick']))
     irc_send('JOIN #{}'.format(config['chan']))
 
-def connect_to_irc(n):
-    log_info('connecting to irc with socket {}'.format(n))
+def connect_to_irc():
+    log_info('connecting to irc with a new socket')
     sock = socket.socket()
-    sock.settimeout(timeout)
+    sock.settimeout(irc_timeout)
     sock.connect((config['host'], config['port']))
-    log_info('irc socket {} connected'.format(n))
+    log_info('new irc socket connected')
     return sock
 
 def send_pong(segs):
@@ -262,7 +259,7 @@ def auto_sends():
     bet_warning()
 
 def start_irc():
-    init_sockets()
+    init_socket()
     auth_and_join()
 
 def bot_loop():
