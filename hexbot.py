@@ -46,6 +46,7 @@ def init_data():
     global data
     data = {
         'bets': {},
+        'betstart_time': None,
         'betend_time': None,
         'final_time': None,
         'bet_warned': False,
@@ -123,6 +124,7 @@ def startbets(sender, message):
                  'Use hh:mm:ss or mm:ss'.format(sender))
         return
     init_data()
+    data['betstart_time'] = datetime.utcnow()
     data['betend_time'] = datetime.utcnow() + delta
     send_msg('Betting is open! PogChamp Place your bets with !bet')
 
@@ -143,7 +145,12 @@ def bet(sender, message):
                  'Use hh:mm:ss or mm:ss'.format(sender))
         return
 
-    data['bets'][sender] = delta
+    # bets are tuples of (bet_time, bet)
+    data['bets'][sender] = (datetime.utcnow(), delta)
+
+def compute_score(final_time, lateness, inaccuracy):
+    score = ((final_time - (((lateness**2) / final_time) / 8) - inaccuracy) / final_time) * 5000
+    return round(score, 2)
 
 def winners(sender, message):
     if sender not in mods:
@@ -161,14 +168,26 @@ def winners(sender, message):
 
     results = []
     for user in data['bets']:
-        user_bet = data['bets'][user]
-        results.append(
-            (abs((user_bet - final_time).total_seconds()), user, user_bet))
+        betstart_time = data['betstart_time']
+        user_bet_time = data['bets'][user][0]
+        user_bet = data['bets'][user][1]
+
+        lateness_delta = user_bet_time - betstart_time
+        lateness = abs((lateness_delta).total_seconds())
+        inaccuracy = abs((user_bet - final_time).total_seconds())
+
+        score = compute_score(final_time.total_seconds(), lateness, inaccuracy)
+
+        results.append((score, user, user_bet, lateness_delta))
+
     results = sorted(results)
     winning_bets = results[:5]
-    winning_bets = ['{}: {}'.format(bet[1], str(bet[2])) for bet in winning_bets]
+    formatted_winners = []
+    for bet in winning_bets:
+        formatted_winners.append('{}: {} ({} at {})'.format(
+            bet[1], bet[0], str(bet[2]), str(bet[3])))
     winners = ''
-    for i, winner in enumerate(winning_bets):
+    for i, winner in enumerate(formatted_winners):
         winners += '{}. {} '.format(i + 1, winner)
     send_msg(winners)
 
