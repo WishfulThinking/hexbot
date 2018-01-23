@@ -79,25 +79,52 @@ def send_pong(segs):
 def send_msg(message):
     irc_send('PRIVMSG #{} :/me {}'.format(config['chan'], message))
 
+# this isn't working right now, spam prevention maybe?
 def send_whisper(sender, message):
-    irc_send('PRIVMSG #jtv :/w {} {}'.format(sender, message))
+    irc_send('PRIVMSG #{} :/w {} {}'.format(config['chan'], sender, message))
 
 def parse_time(message):
     time_segs = message.split(':')
     if not (len(time_segs) == 3 or len(time_segs) == 2):
         return None
-    hours, minutes, seconds = (0, 0, 0)
+    hours, minutes, seconds, milliseconds = (0, 0, 0, 0)
     try:
+        # strptime doesn't support 25+ hours (for something like BotW hundo)
+        # yes this logic tree is madness
         if len(time_segs) == 3:
             hours = int(time_segs[0])
             minutes = int(time_segs[1])
-            seconds = int(time_segs[2])
+            second_segs = time_segs[2].split('.')
+            if len(second_segs) == 2:
+                seconds = int(second_segs[0])
+                if len(second_segs[1]) > 3:
+                    raise ValueError()
+                elif len(second_segs[1]) == 1:
+                    milliseconds = int(second_segs[1]) * 100
+                elif len(second_segs[1]) == 2:
+                    milliseconds = int(second_segs[1]) * 10
+                elif len(second_segs[1]) == 3:
+                    milliseconds = int(second_segs[1])
+            else:
+                seconds = int(second_segs[0])
         if len(time_segs) == 2:
             minutes = int(time_segs[0])
-            seconds = int(time_segs[1])
+            second_segs = time_segs[1].split('.')
+            if len(second_segs) == 2:
+                seconds = int(second_segs[0])
+                if len(second_segs[1]) > 3:
+                    raise ValueError()
+                elif len(second_segs[1]) == 1:
+                    milliseconds = int(second_segs[1]) * 100
+                elif len(second_segs[1]) == 2:
+                    milliseconds = int(second_segs[1]) * 10
+                elif len(second_segs[1]) == 3:
+                    milliseconds = int(second_segs[1])
+            else:
+                seconds = int(second_segs[0])
     except ValueError:
         return None
-    delta = timedelta(hours=hours, minutes=minutes, seconds=seconds)
+    delta = timedelta(hours=hours, minutes=minutes, seconds=seconds, milliseconds=milliseconds)
     return delta
 
 def echo(sender, message):
@@ -149,8 +176,16 @@ def bet(sender, message):
     data['bets'][sender] = (datetime.utcnow(), delta)
 
 def compute_score(final_time, lateness, inaccuracy):
-    score = ((final_time - (((lateness**2) / final_time) / 8) - inaccuracy) / final_time) * 5000
-    return round(score, 2)
+    score = ((final_time - (((lateness**2) / final_time) / 8) - inaccuracy) / final_time) * 100000
+    return max(round(score, 2), 0)
+
+def format_delta(delta):
+    delta = str(delta)
+    delta_segs = delta.split('.')
+    if len(delta_segs) == 1:
+        return delta_segs[0]
+    else:
+        return '{}.{}'.format(delta_segs[0], delta_segs[1][:3])
 
 def winners(sender, message):
     if sender not in mods:
@@ -185,7 +220,7 @@ def winners(sender, message):
     formatted_winners = []
     for bet in winning_bets:
         formatted_winners.append('{}: {} ({} at {})'.format(
-            bet[1], bet[0], str(bet[2]), str(bet[3])))
+            bet[1], bet[0], format_delta(str(bet[2])), format_delta(str(bet[3]))))
     winners = ''
     for i, winner in enumerate(formatted_winners):
         winners += '{}. {} '.format(i + 1, winner)
@@ -212,14 +247,15 @@ def finaltime(sender, message):
                  'Use hh:mm:ss or mm:ss'.format(sender))
         return
     data['final_time'] = delta
-    send_msg('The final time for the run is {}!'.format(delta))
+    send_msg('The final time for the run is {}!'.format(format_delta(delta)))
     winners(sender, message)
 
 def checkbet(sender, message):
     bet = data['bets'].get(sender)
     if not bet:
         return
-    send_whisper(sender, 'Your current bet is {}'.format(bet))
+    bet = bet[1]
+    send_msg('@{} Your current bet is {}'.format(sender, format_delta(bet)))
     
 commands = {
     'echo': echo,
