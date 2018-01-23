@@ -1,0 +1,10 @@
+[irc]
+host = irc.chat.twitch.tv
+port = 6667
+nick = hexbet
+pass = oauth:xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+chan = tactiledactyl
+
+# you can get an OAuth token from https://twitchapps.com/tmi/
+# or just go through the OAuth implicit flow yourself
+# implicit tokens give you a much longer lifetime
