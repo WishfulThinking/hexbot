@@ -272,7 +272,7 @@ def checkbet(sender, message):
 def betcount(sender, message):
     if sender not in mods:
         return
-    send_msg('The amount of people that betted is: {}!'.format(len(data['bets'])))
+    send_msg('The current amount of bets is: {}!'.format(len(data['bets'])))
     
 commands = {
     'echo': echo,
