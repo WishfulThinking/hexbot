@@ -273,7 +273,8 @@ def checkbet(sender, message):
     if not bet:
         return
     send_msg('@{} Your current bet is {} (at {})'.format(
-        sender, format_delta(bet[1]), format_delta(bet[0])))
+        sender, format_delta(bet[1]),
+        format_delta(bet[0] - data['betstart_time'])))
     
 def betcount(sender, message):
     if sender not in mods:
