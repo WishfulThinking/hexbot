@@ -269,6 +269,11 @@ def checkbet(sender, message):
     bet = bet[1]
     send_msg('@{} Your current bet is {}'.format(sender, format_delta(bet)))
     
+def betcount(sender, message):
+    if sender not in mods:
+        return
+    send_msg('The amount of people that betted is: {}!'.format(len(data['bets'])))
+    
 commands = {
     'echo': echo,
     'wecho': wecho,
@@ -277,6 +282,7 @@ commands = {
     'winners': winners,
     'finaltime': finaltime,
     'checkbet': checkbet,
+    'betcount': betcount,
 }
 
 def process_message(segs):
