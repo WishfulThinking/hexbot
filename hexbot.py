@@ -146,7 +146,7 @@ def startbets(sender, message):
     global data
     delta = parse_time(message)
     if not delta:
-        send_msg('{}, '
+        send_msg('@{} '
                  'invalid time format for !startbets. '
                  'Use hh:mm:ss or mm:ss'.format(sender))
         return
@@ -158,16 +158,16 @@ def startbets(sender, message):
 def bet(sender, message):
     betend_time = data.get('betend_time')
     if not betend_time:
-        send_msg('{}, there\'s no active run to bet on'.format(sender))
+        send_msg('@{} there\'s no active run to bet on'.format(sender))
         return
 
     if datetime.utcnow() > data.get('betend_time'):
-        send_msg('{}, betting has ended for this run'.format(sender))
+        send_msg('@{} betting has ended for this run'.format(sender))
         return
 
     delta = parse_time(message)
     if not delta:
-        send_msg('{}, '
+        send_msg('@{} '
                  'invalid time format for !bet. '
                  'Use hh:mm:ss or mm:ss'.format(sender))
         return
@@ -193,12 +193,12 @@ def winners(sender, message):
 
     betend_time = data.get('betend_time')
     if not betend_time:
-        send_msg('{}, there\'s no active run'.format(sender))
+        send_msg('@{} there\'s no active run'.format(sender))
         return
 
     final_time = data.get('final_time')
     if not final_time:
-        send_msg('{}, the final time has not been set'.format(sender))
+        send_msg('@{} the final time has not been set'.format(sender))
         return
 
     results = []
@@ -218,6 +218,10 @@ def winners(sender, message):
     results = sorted(results)
     results.reverse()
 
+    if len(results) < 1:
+        send_msg('@{} there were no bets'.format(sender))
+        return
+
     results_file = open('results_{}'.format(str(betstart_time)), 'w')
     results_file.write('{}, {}, {}\n'.format(str(final_time), str(betstart_time), str(betend_time)))
     for result in results:
@@ -229,6 +233,7 @@ def winners(sender, message):
     results_file.close()
 
     winning_bets = results[:5]
+
     formatted_winners = []
     for bet in winning_bets:
         formatted_winners.append('{}: {} ({} at {})'.format(
@@ -236,6 +241,7 @@ def winners(sender, message):
     winners = ''
     for i, winner in enumerate(formatted_winners):
         winners += '{}. {} '.format(i + 1, winner)
+
     send_msg(winners)
 
 def finaltime(sender, message):
@@ -246,7 +252,7 @@ def finaltime(sender, message):
 
     betend_time = data.get('betend_time')
     if not betend_time:
-        send_msg('{}, there\'s no active run'.format(sender))
+        send_msg('@{} there\'s no active run'.format(sender))
         return
 
     if datetime.utcnow() < betend_time:
@@ -254,7 +260,7 @@ def finaltime(sender, message):
 
     delta = parse_time(message)
     if not delta:
-        send_msg('{}, '
+        send_msg('@{} '
                  'invalid time format for !finaltime. '
                  'Use hh:mm:ss or mm:ss'.format(sender))
         return
@@ -266,8 +272,8 @@ def checkbet(sender, message):
     bet = data['bets'].get(sender)
     if not bet:
         return
-    bet = bet[1]
-    send_msg('@{} Your current bet is {}'.format(sender, format_delta(bet)))
+    send_msg('@{} Your current bet is {} (at {})'.format(
+        sender, format_delta(bet[1]), format_delta(bet[0])))
     
 def betcount(sender, message):
     if sender not in mods:
