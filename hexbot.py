@@ -124,7 +124,14 @@ def parse_time(message):
                 seconds = int(second_segs[0])
     except ValueError:
         return None
-    delta = timedelta(hours=hours, minutes=minutes, seconds=seconds, milliseconds=milliseconds)
+    try:
+        delta = timedelta(
+            hours=hours,
+            minutes=minutes,
+            seconds=seconds,
+            milliseconds=milliseconds)
+    except:
+        return None
     return delta
 
 def echo(sender, message):
