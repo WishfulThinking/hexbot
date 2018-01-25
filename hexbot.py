@@ -362,7 +362,7 @@ def load_data():
     try:
         autosave = open('autosave', 'rb')
         data = pickle.load(autosave)
-        log_debug('data loaded successfully')
+        log_info('data loaded successfully')
     except:
         init_data()
 
