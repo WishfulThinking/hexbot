@@ -6,6 +6,7 @@ import os
 from datetime import datetime, timedelta
 import time
 import configparser
+import pickle
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -24,7 +25,7 @@ irc_socket = None
 
 irc_timeout = 5 * 60
 
-mods = set()
+mods = set([''])
 
 data = {}
 
@@ -46,6 +47,7 @@ def init_data():
     global data
     data = {
         'bets': {},
+        'last_persist': datetime.utcnow(),
         'betstart_time': None,
         'betend_time': None,
         'final_time': None,
@@ -192,7 +194,7 @@ def format_delta(delta):
     if len(delta_segs) == 1:
         return delta_segs[0]
     else:
-        return '{}.{}'.format(delta_segs[0], delta_segs[1][:3])
+        return '{}.{}'.format(delta_segs[0], delta_segs[1][:2])
 
 def winners(sender, message):
     if sender not in mods:
@@ -345,6 +347,28 @@ def bet_warning():
 def auto_sends():
     bet_warning()
 
+def persist_data():
+    global data
+    last_persist = data['last_persist']
+    if (datetime.utcnow() - last_persist).total_seconds() > 10:
+        log_debug("persisting data now")
+        autosave = open('autosave', 'wb')
+        pickle.dump(data, autosave)
+        autosave.close()
+        data['last_persist'] = datetime.utcnow()
+
+def load_data():
+    global data
+    try:
+        autosave = open('autosave', 'rb')
+        data = pickle.load(autosave)
+        log_debug('data loaded successfully')
+    except:
+        init_data()
+
+def periodic():
+    persist_data()
+
 def start_irc():
     init_socket()
     auth_and_join()
@@ -364,6 +388,7 @@ def bot_loop():
                 process_line(segs)
 
             auto_sends()
+            periodic()
         except socket.timeout:
             start_irc()
             sock = irc_socket
@@ -371,7 +396,7 @@ def bot_loop():
 
 def main():
     print_startup_message()
-    init_data()
+    load_data()
     start_irc()
     bot_loop()
 
