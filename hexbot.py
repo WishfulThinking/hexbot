@@ -87,12 +87,24 @@ def send_whisper(sender, message):
 
 def parse_time(message):
     time_segs = message.split(':')
-    if not (len(time_segs) == 3 or len(time_segs) == 2):
+    if not (len(time_segs) >= 4 or len(time_segs) <= 2):
         return None
     hours, minutes, seconds, milliseconds = (0, 0, 0, 0)
     try:
         # strptime doesn't support 25+ hours (for something like BotW hundo)
         # yes this logic tree is madness
+        if len(time_segs) == 4:
+            hours = int(time_segs[0])
+            minutes = int(time_segs[1])
+            seconds = int(time_segs[2])
+            if len(time_segs[3]) > 3:
+                raise ValueError()
+            elif len(time_segs[3]) == 1:
+                    milliseconds = int(time_segs[3]) * 100
+                elif len(time_segs[3]) == 2:
+                    milliseconds = int(time_segs[3]) * 10
+                elif len(time_segs[3]) == 3:
+                    milliseconds = int(time_segs[3])
         if len(time_segs) == 3:
             hours = int(time_segs[0])
             minutes = int(time_segs[1])
