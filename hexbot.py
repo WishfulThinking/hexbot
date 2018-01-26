@@ -87,7 +87,7 @@ def send_whisper(sender, message):
 
 def parse_time(message):
     time_segs = message.split(':')
-    if not (len(time_segs) <= 4 or len(time_segs) >= 2):
+    if not (len(time_segs) <= 4 and len(time_segs) >= 2):
         return None
     hours, minutes, seconds, milliseconds = (0, 0, 0, 0)
     try:
@@ -100,11 +100,11 @@ def parse_time(message):
             if len(time_segs[3]) > 3:
                 raise ValueError()
             elif len(time_segs[3]) == 1:
-                    milliseconds = int(time_segs[3]) * 100
-                elif len(time_segs[3]) == 2:
-                    milliseconds = int(time_segs[3]) * 10
-                elif len(time_segs[3]) == 3:
-                    milliseconds = int(time_segs[3])
+                milliseconds = int(time_segs[3]) * 100
+            elif len(time_segs[3]) == 2:
+                milliseconds = int(time_segs[3]) * 10
+            elif len(time_segs[3]) == 3:
+                milliseconds = int(time_segs[3])
         if len(time_segs) == 3:
             hours = int(time_segs[0])
             minutes = int(time_segs[1])
