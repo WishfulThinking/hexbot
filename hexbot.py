@@ -169,7 +169,7 @@ def startbets(sender, message):
     if not delta:
         send_msg('@{} '
                  'invalid time format for !startbets. '
-                 'Use hh:mm:ss or mm:ss'.format(sender))
+                 'Use h:mm:ss.ms'.format(sender))
         return
     init_data()
     data['betstart_time'] = datetime.utcnow()
@@ -190,7 +190,7 @@ def bet(sender, message):
     if not delta:
         send_msg('@{} '
                  'invalid time format for !bet. '
-                 'Use hh:mm:ss or mm:ss'.format(sender))
+                 'Use h:mm:ss.ms'.format(sender))
         return
 
     # bets are tuples of (bet_time, bet)
@@ -283,7 +283,7 @@ def finaltime(sender, message):
     if not delta:
         send_msg('@{} '
                  'invalid time format for !finaltime. '
-                 'Use hh:mm:ss or mm:ss'.format(sender))
+                 'Use h:mm:ss.ms'.format(sender))
         return
     data['final_time'] = delta
     send_msg('The final time for the run is {}!'.format(format_delta(delta)))
