@@ -11,7 +11,7 @@ import pickle
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-debug = True
+debug = False
 
 config = {
     'host': config.get('irc', 'host'),
@@ -243,7 +243,7 @@ def winners(sender, message):
         send_msg('@{} there were no bets'.format(sender))
         return
 
-    results_file = open('results_{}'.format(str(betstart_time)), 'w')
+    results_file = open('data/results_{}'.format(str(betstart_time)), 'w')
     results_file.write('{}, {}, {}\n'.format(str(final_time), str(betstart_time), str(betend_time)))
     for result in results:
         results_file.write('{}, {}, {}, {}\n'.format(
