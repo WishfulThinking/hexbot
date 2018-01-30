@@ -1,0 +1,2 @@
+run:
+	uwsgi uwsgi.ini
