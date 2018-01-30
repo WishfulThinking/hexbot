@@ -2,6 +2,7 @@
 <div id="container">
   <div class="offset-xl-2 col-xl-8">
     <a class="text-dark" href='/'><h1 class="display-3">HexBet</h1></a>
+    <h1>Results for Run #{{run_id}}</h1>
     <table id="maintable" class="table table-striped">
       <thead class="thead-dark">
         <tr>
