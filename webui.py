@@ -1,3 +1,5 @@
+# HexBet!!!!!!@!!1!!!!1
+
 from bottle import route, Bottle, view
 
 app = application = Bottle()
