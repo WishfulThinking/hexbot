@@ -70,7 +70,10 @@ def connect_to_irc():
     log_info('connecting to irc with a new socket')
     sock = socket.socket()
     sock.settimeout(irc_timeout)
-    sock.connect((config['host'], config['port']))
+    try:
+        sock.connect((config['host'], config['port']))
+    except TimeoutError:
+        return connect_to_irc()
     log_info('new irc socket connected')
     return sock
 
