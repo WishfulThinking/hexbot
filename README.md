@@ -8,11 +8,11 @@ Starts a round of betting with an estimated run time of h:mm:ss.mmm. This should
 
 `!finaltime h:mm:ss.mmm`
 
-Ends a round of betting with a run time of h:mm:ss.mmm. The winners are be displayed.
+Ends a round of betting with a run time of h:mm:ss.mmm. The winners are displayed.
 
 `!winners`
 
-Displays the top 5 scorers. Score is based on accuracy and how early they bet
+Displays the top 5 scorers. Score is based on accuracy and the earliness of the bet.
 
 `!betcount`
 
@@ -20,7 +20,7 @@ Displays the current number of bets.
 
 `!echo anything`
 
-Hexbet will respond with "anything"
+Hexbet will respond with "anything".
 
 `!wecho anything`
 
