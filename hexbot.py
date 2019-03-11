@@ -305,7 +305,7 @@ def betcount(sender, message):
         return
     send_msg('The current amount of bets is: {}!'.format(len(data['bets'])))
     
-def mods(sender, message):
+def mods_command(sender, message):
     if sender not in mods:
         return
     send_whisper(sender, str(mods))
@@ -319,7 +319,7 @@ commands = {
     'finaltime': finaltime,
     'checkbet': checkbet,
     'betcount': betcount,
-    'mods': mods,
+    'mods': mods_command,
 }
 
 def process_message(segs):
