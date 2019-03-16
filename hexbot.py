@@ -296,7 +296,7 @@ def checkbet(sender, message):
     bet = data['bets'].get(sender)
     if not bet:
         return
-    send_msg('@{} Your current bet is {} (at {})'.format(
+    send_whisper('@{} Your current bet is {} (at {})'.format(
         sender, format_delta(bet[1]),
         format_delta(bet[0] - data['betstart_time'])))
     
